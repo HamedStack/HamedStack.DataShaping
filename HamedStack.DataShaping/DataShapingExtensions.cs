@@ -1,6 +1,7 @@
 ﻿// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
+using System.Dynamic;
 using System.Reflection;
 
 namespace HamedStack.DataShaping;
@@ -79,6 +80,51 @@ public static class DataShapingExtensions
         return dsh;
     }
 
+    /// <summary>
+    /// Converts a <see cref="ShapedData"/> object to a dynamic object.
+    /// </summary>
+    /// <param name="shapedData">The <see cref="ShapedData"/> object to convert.</param>
+    /// <returns>A dynamic object representing the shaped data.</returns>
+    public static dynamic? ToDynamic(this ShapedData? shapedData)
+    {
+        if (shapedData == null)
+            return null;
+
+        dynamic dynamicData = new ExpandoObject();
+        var dynamicDict = (IDictionary<string, object?>)dynamicData;
+
+        foreach (var record in shapedData.Values)
+        {
+            foreach (var field in record)
+            {
+                if (field.Key != null) dynamicDict[field.Key] = field.Value;
+            }
+        }
+
+        return dynamicData;
+    }
+    
+    /// <summary>
+    /// Converts an <see cref="IEnumerable{DataField}"/> to a dynamic object.
+    /// </summary>
+    /// <param name="dataFields">The <see cref="IEnumerable{DataField}"/> to convert.</param>
+    /// <returns>A dynamic object representing the data fields.</returns>
+    public static dynamic? ToDynamic(this IEnumerable<DataField>? dataFields)
+    {
+        if (dataFields == null)
+            return null;
+
+        dynamic dynamicData = new ExpandoObject();
+        var dynamicDict = (IDictionary<string, object?>)dynamicData;
+
+        foreach (var dataField in dataFields)
+        {
+            if (dataField.Key != null) dynamicDict[dataField.Key] = dataField.Value;
+        }
+
+        return dynamicData;
+    }
+    
     /// <summary>
     /// Extracts selected properties' information based on the provided fields.
     /// </summary>
